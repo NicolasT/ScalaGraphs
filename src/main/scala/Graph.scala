@@ -58,10 +58,7 @@ object Funs {
     def gmap[A, B, C, D](f: (Context[A, B]) => Context[C, D])(graph: BaseGraph[A, B]): BaseGraph[C, D] =
         graph match {
             case Empty => Empty.asInstanceOf[BaseGraph[C, D]];
-            case _ => {
-                val (ctx, rest) = (graph.context, graph.graph)
-                f(ctx) &: gmap(f)(rest)
-            }
+            case _ => f(graph.context) &: gmap(f)(graph.graph)
         }
 
     def grev[A, B](graph: BaseGraph[A, B]) = 
@@ -69,11 +66,8 @@ object Funs {
 
     def ufold[A, B, C](fun: (Context[A, B]) => (C) => C)(arg: C)(graph: BaseGraph[A, B]): C =
         graph match {
-            case _ if graph eq Empty => arg;
-            case _ => {
-                val (ctx, rest) = (graph.context, graph.graph)
-                fun(ctx)(ufold(fun)(arg)(rest))
-            }
+            case Empty => arg;
+            case _ => fun(graph.context)(ufold(fun)(arg)(graph.graph))
         }
 
     def nodes[A, B](graph: BaseGraph[A, B]) =
