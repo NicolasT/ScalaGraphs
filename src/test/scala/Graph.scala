@@ -65,5 +65,87 @@ class EmptyGraphSpec extends Spec with ShouldMatchers {
     }
 }
 
+class SingleNodeGraphSpec extends Spec with ShouldMatchers {
+    describe("A single-node graph") {
+        it("should not be empty") {
+            val graph = (Nil, 1, 123, Nil) &: Empty
+            assert(!isEmpty(graph))
+        }
+
+        it("should have Empty as graph") {
+            val graph = (Nil, 1, 123, Nil) &: Empty
+            graph.graph should be theSameInstanceAs (Empty)
+        }
+
+        it("should contain one node") {
+            val graph = (Nil, 1, 123, Nil) &: Empty
+            nodes(graph) should have length (1)
+        }
+
+        it("should have a constant hashcode") {
+            val graph1 = (Nil, 1, 123, Nil) &: Empty
+            val graph2 = (Nil, 1, 123, Nil) &: Empty
+
+            graph1.hashCode should equal (graph2.hashCode)
+        }
+
+        it("should have a different hashcode on different objects") {
+            val graph1 = (Nil, 1, 123, Nil) &: Empty
+            val graph2 = (Nil, 2, "abc", Nil) &: Empty
+
+            graph1.hashCode should not equal (graph2.hashCode)
+        }
+
+        it("should be equal") {
+            val graph1 = (Nil, 1, 123, Nil) &: Empty
+            val graph2 = (Nil, 1, 123, Nil) &: Empty
+
+            graph1 should equal (graph2)
+        }
+
+        it("should not be the same instance") {
+            val graph1 = (Nil, 1, 123, Nil) &: Empty
+            val graph2 = (Nil, 1, 123, Nil) &: Empty
+
+            graph1 should not be theSameInstanceAs (graph2)
+        }
+    }
+}
+
+class MultiNodeGraphSpec extends Spec with ShouldMatchers {
+    describe("A multi-node graph") {
+        it("should be instanciatable") {
+            val graph = (Nil, 2, 456, Nil) &: (Nil, 1, 123, Nil) &: Empty
+            ()
+        }
+
+        it("could possibly contain different types") {
+            val graph = (Nil, 2, "abc", Nil) &: (Nil, 1, 123, Nil) &: Empty
+            ()
+        }
+
+        it("should have a correct node count") {
+            val graph = (Nil, 3, 789, Nil) &: (Nil, 2, 456, Nil) &:
+                        (Nil, 1, 123, Nil) &: Empty
+            nodes(graph) should have length (3)
+        }
+
+        it("should have correct nodes") {
+            val graph = (Nil, 3, 789, Nil) &: (Nil, 2, 456, Nil) &:
+                        (Nil, 1, 123, Nil) &: Empty
+            Set(nodes(graph) :_*) should equal (Set(1, 2, 3))
+        }
+
+        it("should be equal") {
+            def gen() = (Nil, 3, 789, Nil) &: (Nil, 2, 456, Nil) &:
+                        (Nil, 1, 123, Nil) &: Empty
+            val graph1 = gen()
+            val graph2 = gen()
+
+            graph1 should equal (graph2)
+            graph1.hashCode should equal (graph2.hashCode)
+        }
+    }
+}
 
 // vim: set ts=4 sw=4 et:
