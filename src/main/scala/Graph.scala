@@ -34,26 +34,23 @@ import Types._
 trait BaseGraph[A, B] {
     def &:(context: Context[A, B]) = new Graph[A, B](context, this)
 
-    val isEmpty: Boolean
-
     def context: Context[A, B]
     def graph: BaseGraph[A, B]
 }
 
 case object Empty extends BaseGraph[Any, Any] {
-    val isEmpty = true
-
     def context = throw new NoSuchFieldException
     def graph = throw new NoSuchFieldException
 }
 
 case class Graph[A, B](context: Context[A, B], graph: BaseGraph[A, B])
-    extends BaseGraph[A, B] {
-    val isEmpty = false
-}
+    extends BaseGraph[A, B]
 
 object Funs {
-    def isEmpty(graph: BaseGraph[_, _]) = graph.isEmpty
+    def isEmpty(graph: BaseGraph[_, _]): Boolean = graph match {
+        case Empty => true;
+        case _ => false;
+    }
 
     def gmap[A, B, C, D](f: (Context[A, B]) => Context[C, D])(graph: BaseGraph[A, B]): BaseGraph[C, D] =
         graph match {
