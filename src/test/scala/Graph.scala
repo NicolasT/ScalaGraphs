@@ -36,20 +36,6 @@ class EmptyGraphSpec extends Spec with ShouldMatchers {
             assert(isEmpty(Empty))
         }
 
-        it("should have no context") {
-            intercept[NoSuchFieldException] {
-                Empty.context
-                () // Need this for ScalaTest
-            }
-        }
-
-        it("should have no graph") {
-            intercept[NoSuchFieldException] {
-                Empty.graph
-                ()
-            }
-        }
-
         it("should return itself on gmap") {
             val new_ = gmap((ctx: Context[Any, Any]) => ctx)(Empty)
             new_ should be theSameInstanceAs (Empty)

@@ -33,15 +33,9 @@ import Types._
 
 trait BaseGraph[A, B] {
     def &:(context: Context[A, B]) = new Graph[A, B](context, this)
-
-    def context: Context[A, B]
-    def graph: BaseGraph[A, B]
 }
 
-case object Empty extends BaseGraph[Any, Any] {
-    def context = throw new NoSuchFieldException
-    def graph = throw new NoSuchFieldException
-}
+case object Empty extends BaseGraph[Any, Any]
 
 case class Graph[A, B](context: Context[A, B], graph: BaseGraph[A, B])
     extends BaseGraph[A, B]
@@ -55,7 +49,7 @@ object Funs {
     def gmap[A, B, C, D](f: (Context[A, B]) => Context[C, D])(graph: BaseGraph[A, B]): BaseGraph[C, D] =
         graph match {
             case Empty => Empty.asInstanceOf[BaseGraph[C, D]];
-            case _ => f(graph.context) &: gmap(f)(graph.graph)
+            case g: Graph[_, _] => f(g.context) &: gmap(f)(g.graph)
         }
 
     def grev[A, B](graph: BaseGraph[A, B]) = 
@@ -64,7 +58,7 @@ object Funs {
     def ufold[A, B, C](fun: (Context[A, B]) => (C) => C)(arg: C)(graph: BaseGraph[A, B]): C =
         graph match {
             case Empty => arg;
-            case _ => fun(graph.context)(ufold(fun)(arg)(graph.graph))
+            case g: Graph[_, _] => fun(g.context)(ufold(fun)(arg)(g.graph))
         }
 
     def nodes[A, B](graph: BaseGraph[A, B]) =
