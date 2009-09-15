@@ -26,4 +26,5 @@ import sbt._
 
 class ScalaGraphsProject(info: ProjectInfo) extends DefaultProject(info) {
     val scalatest = "org.scalatest" % "scalatest" % "0.9.5"
+    override def compileOptions = super.compileOptions ++ Seq(Unchecked)
 }
