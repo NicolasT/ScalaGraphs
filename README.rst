@@ -13,3 +13,11 @@ more details.
 .. _`Nicolas Trangez`: http://eikke.com
 .. _`Scala programming language`: http://www.scala-lang.org
 .. _LICENSE: LICENSE
+
+Building
+--------
+ScalaGraphs' build system is based on SBT_, the Simple Build Tool. To build the
+package, run *bin/sbt compile*. Execute *bin/sbt actions* to list all possible
+actions.
+
+.. _SBT: http://code.google.com/p/simple-build-tool/
