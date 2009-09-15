@@ -41,13 +41,13 @@ object Types {
      * the node pointed to, and an edge label. Labels can be set to Unit when
      * not used.
      */
-    type Adj[B] = List[Tuple2[B, Node]]
+    type Adj[+B] = List[Tuple2[B, Node]]
     /**
      * Definition of a graph context type
      *
      * A graph is built inductively using contexts.
      */
-    type Context[A, B] = Tuple4[Adj[B], Node, A, Adj[B]]
+    type Context[+A, +B] = Tuple4[Adj[B], Node, A, Adj[B]]
 }
 import Types._
 
@@ -56,7 +56,7 @@ import Types._
  *
  * @author Nicolas Trangez
  */
-trait BaseGraph[A, B] {
+trait BaseGraph[+A, +B] {
     /**
      * Constructor for inductive graphs
      *
@@ -74,13 +74,13 @@ trait BaseGraph[A, B] {
      * @see Context
      * @see Empty
      */
-    def &:(context: Context[A, B]) = {
+    def &:[AA >: A, BB >: B](context: Context[AA, BB]) = {
         val nodes = Funs.nodes(this)
 
         (context._1 ::: context._4) foreach(
-            (node: Tuple2[B, Node]) => require(nodes contains (node._2)))
+            (node: Tuple2[BB, Node]) => require(nodes contains (node._2)))
 
-        new Graph[A, B](context, this)
+        new Graph[AA, BB](context, this)
     }
 }
 
@@ -91,7 +91,7 @@ trait BaseGraph[A, B] {
  *
  * @author Nicolas Trangez
  */
-case object Empty extends BaseGraph[Any, Any]
+case object Empty extends BaseGraph[Nothing, Nothing]
 
 /**
  * Non-empty graph representation
@@ -102,7 +102,7 @@ case object Empty extends BaseGraph[Any, Any]
  *
  * @author Nicolas Trangez
  */
-case class Graph[A, B](context: Context[A, B], graph: BaseGraph[A, B])
+ case class Graph[+A, +B](context: Context[A, B], graph: BaseGraph[A, B])
     extends BaseGraph[A, B]
 
 /**

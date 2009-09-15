@@ -25,7 +25,7 @@
 package com.eikke.scalagraphs.test
 
 import org.scalatest.Spec
-import org.scalatest.matchers.ShouldMatchers
+import org.scalatest.matchers.{ShouldMatchers,BeMatcher,MatchResult}
 
 import com.eikke.scalagraphs.Funs.{isEmpty,gmap,grev,nodes,undir}
 import com.eikke.scalagraphs.Types.Context
@@ -182,5 +182,26 @@ class UndirSpec extends Spec with ShouldMatchers {
         }
     }
 }
+
+class VarianceSpec extends Spec with ShouldMatchers {
+    case class A(i: Int)
+    case class B(j: Int) extends A(j)
+
+    class GraphTypeMatcher extends BeMatcher[Graph[A, String]] {
+        def apply(left: Graph[A, String]) =
+            MatchResult(true, "Invalid type", "Something else")
+    }
+    val correctType = new GraphTypeMatcher
+
+    describe("A graph") {
+        it("should be covariant in A and B") {
+            val graph = (("e1", 1) :: Nil, 2, B(456), ("e2", 1) :: Nil) &:
+                            (Nil, 1, A(123), Nil) &: Empty
+
+            graph should be (correctType)
+        }
+    }
+}
+
 
 // vim: set ts=4 sw=4 et:
