@@ -27,7 +27,7 @@ package com.eikke.scalagraphs.test
 import org.scalatest.Spec
 import org.scalatest.matchers.ShouldMatchers
 
-import com.eikke.scalagraphs.Funs.{isEmpty,gmap,grev,nodes}
+import com.eikke.scalagraphs.Funs.{isEmpty,gmap,grev,nodes,undir}
 import com.eikke.scalagraphs.Types.Context
 
 class EmptyGraphSpec extends Spec with ShouldMatchers {
@@ -151,6 +151,34 @@ class MultiNodeGraphSpec extends Spec with ShouldMatchers {
             val graph = (("test", 1) :: Nil, 2, 456, Nil) &:
                     (Nil, 1, 123, Nil) &: Empty
             ()
+        }
+    }
+}
+
+
+class UndirSpec extends Spec with ShouldMatchers {
+    describe("The undir function") {
+        it("should return Empty on Empty input") {
+            undir(Empty) should equal (Empty)
+        }
+
+        it("should not modify a single-node graph") {
+            val in = (Nil, 1, 123, Nil) &: Empty
+
+            undir(in) should equal (in)
+        }
+
+        it("should undir a multi-node graph") {
+            val in = (((), 1) :: ((), 2) :: Nil, 3, 789, ((), 1) :: Nil) &:
+                     (((), 1) :: Nil, 2, 456, Nil) &:
+                     (Nil, 1, 123, Nil) &: Empty
+
+            val out = (((), 1) :: ((), 2) :: Nil, 3, 789,
+                        ((), 1) :: ((), 2) :: Nil) &:
+                      (((), 1) :: Nil, 2, 456, ((), 1) :: Nil) &:
+                      (Nil, 1, 123, Nil) &: Empty
+
+            undir(in) should equal (out)
         }
     }
 }

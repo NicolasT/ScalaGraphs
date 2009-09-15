@@ -70,6 +70,16 @@ object Funs {
 
     def nodes[A, B](graph: BaseGraph[A, B]) =
         ufold((ctx: Context[A, B]) => (acc: List[Node]) => ctx._2 :: acc)(Nil)(graph)
+
+    def undir[A, B](graph: BaseGraph[A, B]): BaseGraph[A, B] = {
+        def combine(p: Adj[B], s: Adj[B]): Adj[B] = Set((p ::: s) :_*) toList
+        def helper(ctx: Context[A, B]): Context[A, B] = {
+            val adj = combine(ctx._1, ctx._4)
+            (adj, ctx._2, ctx._3, adj)
+        }
+
+        gmap(helper)(graph)
+    }
 }
 
 import Funs._
