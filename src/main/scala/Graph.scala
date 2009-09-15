@@ -26,13 +26,20 @@ package com.eikke.scalagraphs
 
 object Types {
     type Node = Int
-    type Adj[B] = Seq[Tuple2[B, Node]]
+    type Adj[B] = List[Tuple2[B, Node]]
     type Context[A, B] = Tuple4[Adj[B], Node, A, Adj[B]]
 }
 import Types._
 
 trait BaseGraph[A, B] {
-    def &:(context: Context[A, B]) = new Graph[A, B](context, this)
+    def &:(context: Context[A, B]) = {
+        val nodes = Funs.nodes(this)
+
+        (context._1 ::: context._4) foreach(
+            (node: Tuple2[B, Node]) => require(nodes contains (node._2)))
+
+        new Graph[A, B](context, this)
+    }
 }
 
 case object Empty extends BaseGraph[Any, Any]

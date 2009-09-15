@@ -95,6 +95,13 @@ class SingleNodeGraphSpec extends Spec with ShouldMatchers {
 
             graph1 should not be theSameInstanceAs (graph2)
         }
+
+        it("can not have edges") {
+            intercept[IllegalArgumentException] {
+                val graph = (("test", 2) :: Nil, 1, 123, Nil) &: Empty
+                ()
+            }
+        }
     }
 }
 
@@ -130,6 +137,20 @@ class MultiNodeGraphSpec extends Spec with ShouldMatchers {
 
             graph1 should equal (graph2)
             graph1.hashCode should equal (graph2.hashCode)
+        }
+
+        it("can not link to unknown nodes") {
+            intercept[IllegalArgumentException] {
+                val graph = (("test", 3) :: Nil, 2, 456, Nil) &:
+                    (Nil, 1, 123, Nil) &: Empty
+                ()
+            }
+        }
+
+        it("can contain legal edges") {
+            val graph = (("test", 1) :: Nil, 2, 456, Nil) &:
+                    (Nil, 1, 123, Nil) &: Empty
+            ()
         }
     }
 }
