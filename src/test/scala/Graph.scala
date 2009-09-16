@@ -203,5 +203,28 @@ class VarianceSpec extends Spec with ShouldMatchers {
     }
 }
 
+class PatternMatchSpec extends Spec with ShouldMatchers {
+    describe("A graph") {
+        it("should match patterns") {
+            val graph = (Nil, 2, 456, Nil) &: (Nil, 1, 123, Nil) &: Empty
+
+            graph match {
+                case Graph((_, 2, x1, _), g1) => {
+                    x1 should equal (456)
+                    g1 should be theSameInstanceAs (graph.graph)
+                }
+                case _ => assert(false)
+            }
+
+            graph.graph match {
+                case Graph((_, 1, x2, _), g2) => {
+                    x2 should equal (123)
+                    g2 should be theSameInstanceAs (Empty)
+                }
+                case _ => assert(false)
+            }
+        }
+    }
+}
 
 // vim: set ts=4 sw=4 et:
