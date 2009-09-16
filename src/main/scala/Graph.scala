@@ -41,7 +41,7 @@ object Types {
      * the node pointed to, and an edge label. Labels can be set to Unit when
      * not used.
      */
-    type Adj[+B] = List[Tuple2[B, Node]]
+    type Adj[+B] = Seq[Tuple2[B, Node]]
     /**
      * Definition of a graph context type
      *
@@ -77,7 +77,7 @@ trait BaseGraph[+A, +B] {
     def &:[AA >: A, BB >: B](context: Context[AA, BB]) = {
         val nodes = Funs.nodes(this)
 
-        (context._1 ::: context._4) foreach(
+        (context._1 ++ context._4) foreach(
             (node: Tuple2[BB, Node]) => require(nodes contains (node._2)))
 
         new Graph[AA, BB](context, this)
@@ -184,7 +184,7 @@ object Funs {
      * @return       undirected graph
      */
     def undir[A, B](graph: BaseGraph[A, B]): BaseGraph[A, B] = {
-        def combine(p: Adj[B], s: Adj[B]): Adj[B] = Set((p ::: s) :_*) toList
+        def combine(p: Adj[B], s: Adj[B]): Adj[B] = Set((p ++ s) :_*) toList
         def helper(ctx: Context[A, B]): Context[A, B] = {
             val adj = combine(ctx._1, ctx._4)
             (adj, ctx._2, ctx._3, adj)
