@@ -136,7 +136,7 @@ object Funs {
     def gmap[A, B, C, D](f: (Context[A, B]) => Context[C, D])(graph: BaseGraph[A, B]): BaseGraph[C, D] =
         graph match {
             case Empty => Empty.asInstanceOf[BaseGraph[C, D]];
-            case g: Graph[_, _] => f(g.context) &: gmap(f)(g.graph)
+            case Graph(ctx, parent) => f(ctx) &: gmap(f)(parent)
         }
 
     /**
@@ -162,7 +162,7 @@ object Funs {
     def ufold[A, B, C](fun: (Context[A, B]) => (C) => C)(arg: C)(graph: BaseGraph[A, B]): C =
         graph match {
             case Empty => arg;
-            case g: Graph[_, _] => fun(g.context)(ufold(fun)(arg)(g.graph))
+            case Graph(ctx, parent) => fun(ctx)(ufold(fun)(arg)(parent))
         }
 
     /**
