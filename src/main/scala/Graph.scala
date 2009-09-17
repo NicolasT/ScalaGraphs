@@ -115,7 +115,7 @@ trait BaseGraph[+A, +B] {
         if(post isEmpty)
             return (None, this)
 
-        val base = ((Empty: BaseGraph[A, B]) /: pre)((graph: BaseGraph[A, B], context: Context[A, B]) => context &: graph)
+        val base = ((Empty: BaseGraph[A, B]) /: pre)((graph, context) => context &: graph)
 
         // TODO Make this code functional/recursive!
         var the_ctx = post.head
@@ -126,8 +126,8 @@ trait BaseGraph[+A, +B] {
             val new_ctx = (ctx._1 filter(_._2 != node), ctx._2, ctx._3, ctx._4 filter(_._2 != node))
             the_graph = new_ctx &: the_graph
 
-            val new_ins = ctx._4.filter(_._2 == node).map((n: (B, Node)) => (n._1, ctx._2))
-            val new_outs = ctx._1.filter(_._2 == node).map((n: (B, Node)) => (n._1, ctx._2))
+            val new_ins = ctx._4.filter(_._2 == node).map(n => (n._1, ctx._2))
+            val new_outs = ctx._1.filter(_._2 == node).map(n => (n._1, ctx._2))
 
             the_ctx = (new_ins ++ the_ctx._1, the_ctx._2, the_ctx._3, new_outs ++ the_ctx._4)
             ()
@@ -201,7 +201,7 @@ object Funs {
      *               <code>graph</code>
      */
     def grev[A, B](graph: BaseGraph[A, B]) = 
-        gmap((ctx: Context[_, _]) => (ctx._4, ctx._2, ctx._3, ctx._1))(graph)
+        gmap((ctx: Context[A, B]) => (ctx._4, ctx._2, ctx._3, ctx._1))(graph)
 
     /**
      * Calculate a value by folding all nodes in a graph
