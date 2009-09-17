@@ -277,6 +277,44 @@ object Funs {
             case (None, _) => None;
             case (Some(ctx), _) => Some(ctx._1 map (_._2))
         }
+
+
+    /**
+     * Calculate the degree of a node, or None if the node can't be found
+     *
+     * @param v  node to calculate degree of
+     *
+     * @return   optional degree
+     *
+     * @todo     write tests
+     */
+    def deg[A, B](v: Node)(graph: BaseGraph[A, B]): Option[Int] =
+        v &: graph match {
+            case (None, _) => None;
+            case (Some(ctx), _) => Some(ctx._1.length + ctx._4.length)
+        }
+
+    /**
+     * Delete one node from a graph
+     *
+     * @param v      node to delete
+     * @param graph  graph to delete node from
+     *
+     * @return       graph without given node
+     *
+     * @todo         write tests
+     */
+    def del[A, B](v: Node)(graph: BaseGraph[A, B]): BaseGraph[A, B] =
+        (v &: graph)._2
+
+    /**
+     * Calculate a list of all successors of a given context
+     *
+     * @param ctx  context to retrieve successors from
+     *
+     * @return     list of successors of the given context
+     */
+    def suc[A, B](ctx: Context[A, B]) = ctx._4 map(_._2) toList
 }
 
 import Funs._
