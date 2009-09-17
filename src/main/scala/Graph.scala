@@ -82,6 +82,76 @@ trait BaseGraph[+A, +B] {
 
         new Graph[AA, BB](context, this)
     }
+
+    /**
+     * Extract a list of all contexts in a graph
+     *
+     * @param graph  graph to extract nodes from
+     *
+     * @return       list of all nodes in the graph
+     */
+    private def getContexts(): List[Context[A, B]] = {
+        def helper(graph: BaseGraph[A, B]): List[Context[A, B]] =
+            graph match {
+                case Empty => Nil;
+                case Graph(ctx, parent) => ctx :: helper(parent)
+            }
+
+        helper(this)
+    }
+
+    /**
+     * Extract one node from a graph, and return the leftover graph
+     *
+     * If the node can't be found in the graph, the context value will be None,
+     * and the original graph will be returned.
+     *
+     * @param node  node to extract
+     *
+     * @return      optional context and leftover graph
+     *
+     * @todo        write tests
+     * @todo        find a better method name (<code>&amp;v:</code> would be
+     *              ideal)
+     */
+    def &:(node: Node): Tuple2[Option[Context[A, B]], BaseGraph[A, B]] = {
+        // Implementation
+        //
+        // 1. Generate a list of all contexts of graph
+        // 2. Reverse the list
+        // 3. Create a new graph of all contexts, until the element to be looked
+        // up is found
+        // 4. Add all other elements to the graph, add their outgoing edges to
+        // the looked up context to the incoming edges of the looked up context
+        // 5. Done
+
+        val contexts = getContexts()
+        val reverse_contexts = contexts.reverse
+        val (pre, post) = reverse_contexts.span(_._2 != node)
+
+        if(post isEmpty)
+            return (None, this)
+
+        val base = pre.foldLeft(Empty: BaseGraph[A, B])((graph: BaseGraph[A, B], context: Context[A, B]) => context &: graph)
+
+        // TODO Make this code functional/recursive!
+        var the_ctx = post.head
+        var the_graph = base
+
+        for(ctx <- post.tail) {
+            // Create new context without links to node
+            val new_ctx = (ctx._1 filter(_._2 != node), ctx._2, ctx._3, ctx._4 filter(_._2 != node))
+            the_graph = new_ctx &: the_graph
+
+            val new_ins = ctx._4.filter((_: Tuple2[B, Node])._2 == node).map((n: Tuple2[B, Node]) => (n._1, ctx._2))
+            val new_outs = ctx._1.filter((_: Tuple2[B, Node])._2 == node).map((n: Tuple2[B, Node]) => (n._1, ctx._2))
+
+            the_ctx = (new_ins ++ the_ctx._1, the_ctx._2, the_ctx._3, new_outs ++ the_ctx._4)
+            ()
+        }
+
+        (Some(the_ctx), the_graph)
+    }
 }
 
 /**
