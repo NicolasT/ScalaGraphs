@@ -339,6 +339,47 @@ object Funs {
             case (Some(ctx), g) => nodes.head :: dfs(suc(ctx) ::: nodes.tail)(g)
         }
     }
+
+    import java.io.OutputStream
+    /**
+     * Dump a graph structure as a Graphviz dot file
+     *
+     * This is only of proof-of-concept quality
+     *
+     * @param graph  graph to dump
+     * @param out    outputstream to write dot data to
+     *
+     * @todo         write tests
+     * @todo         cleanup, enhance implementation
+     */
+    def write[A, B](graph: BaseGraph[A, B])(out: OutputStream): Unit = {
+        def writeNextContext(g: BaseGraph[A, B]): Unit =
+            g match {
+                case Empty => ();
+                case Graph(ctx, parent) => {
+                    out.write(("N" + ctx._2 + " [label=\"(" + ctx._2 + " :: ").getBytes)
+                    out.write((ctx._3 + ")\"]\n").getBytes)
+                    for((l, n) <- ctx._1) {
+                        out.write(("N" + n + " -> N" + ctx._2).getBytes)
+                        if(l != ())
+                            out.write((" [label=\"" + l + "\"]").getBytes)
+                        out.write("\n".getBytes)
+                    }
+                    for((l, n) <- ctx._4) {
+                        out.write(("N" + ctx._2 + " -> N" + n).getBytes)
+                        if(l != ())
+                            out.write((" [label=\"" + l + "\"]").getBytes)
+                        out.write("\n".getBytes)
+                    }
+
+                    writeNextContext(parent)
+                }
+            }
+
+        out.write("digraph {\n".getBytes)
+        writeNextContext(graph)
+        out.write("}\n".getBytes)
+    }
 }
 
 import Funs._
@@ -366,5 +407,16 @@ object Test {
 
        println("All nodes:")
        nodes(graph) foreach(println(_: Node))
+
+       val g1 = (Nil, 1, 123, Nil) &: Empty
+       val g2 = (Nil, 2, 456, ((), 1) :: Nil) &: g1
+       val g3 = (("a", 2) :: ("b", 1) :: Nil, 3, 789, Nil) &: g2
+       val g4 = (((), 3) :: ((), 2) :: Nil, 4, 012,
+         ((), 1) :: ("c", 2) :: ("d", 3) :: Nil) &: g3
+
+       import java.io.FileOutputStream
+       val fp = new FileOutputStream("testout.dot")
+       write(g4)(fp)
+       fp.close()
    }
 }
