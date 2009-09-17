@@ -115,7 +115,7 @@ trait BaseGraph[+A, +B] {
         if(post isEmpty)
             return (None, this)
 
-        val base = pre.foldLeft(Empty: BaseGraph[A, B])((graph: BaseGraph[A, B], context: Context[A, B]) => context &: graph)
+        val base = ((Empty: BaseGraph[A, B]) /: pre)((graph: BaseGraph[A, B], context: Context[A, B]) => context &: graph)
 
         // TODO Make this code functional/recursive!
         var the_ctx = post.head
