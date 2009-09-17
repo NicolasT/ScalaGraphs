@@ -84,23 +84,6 @@ trait BaseGraph[+A, +B] {
     }
 
     /**
-     * Extract a list of all contexts in a graph
-     *
-     * @param graph  graph to extract nodes from
-     *
-     * @return       list of all nodes in the graph
-     */
-    private def getContexts(): List[Context[A, B]] = {
-        def helper(graph: BaseGraph[A, B]): List[Context[A, B]] =
-            graph match {
-                case Empty => Nil;
-                case Graph(ctx, parent) => ctx :: helper(parent)
-            }
-
-        helper(this)
-    }
-
-    /**
      * Extract one node from a graph, and return the leftover graph
      *
      * If the node can't be found in the graph, the context value will be None,
@@ -125,7 +108,7 @@ trait BaseGraph[+A, +B] {
         // the looked up context to the incoming edges of the looked up context
         // 5. Done
 
-        val contexts = getContexts()
+        val contexts = Funs.ufold((ctx: Context[A, B]) => (acc: List[Context[A, B]]) => ctx :: acc)(Nil)(this)
         val reverse_contexts = contexts.reverse
         val (pre, post) = reverse_contexts.span(_._2 != node)
 
