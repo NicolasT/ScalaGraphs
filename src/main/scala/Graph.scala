@@ -315,6 +315,30 @@ object Funs {
      * @return     list of successors of the given context
      */
     def suc[A, B](ctx: Context[A, B]) = ctx._4 map(_._2) toList
+
+    /**
+     * Calculate a node list of all nodes in a graph in depth-first order
+     *
+     * This is an implementation of depth-first search.
+     *
+     * @param nodes  list of starting nodes
+     * @param graph  graph to traverse
+     *
+     * @return       list of nodes in DFS order
+     *
+     * @todo         write tests
+     */
+    def dfs[A, B](nodes: List[Node])(graph: BaseGraph[A, B]): List[Node] = {
+        if(nodes isEmpty)
+            return Nil
+        if(isEmpty(graph))
+            return Nil
+
+        nodes.head &: graph match {
+            case (None, g) => dfs(nodes tail)(g);
+            case (Some(ctx), g) => nodes.head :: dfs(suc(ctx) ::: nodes.tail)(g)
+        }
+    }
 }
 
 import Funs._
