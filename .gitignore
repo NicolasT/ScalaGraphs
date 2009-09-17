@@ -1,5 +1,6 @@
 *.bak
 *.swp
+testout.*
 README.html
 target/
 lib_managed/

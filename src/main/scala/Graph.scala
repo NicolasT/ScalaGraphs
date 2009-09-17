@@ -188,7 +188,7 @@ object Funs {
      */
     def gmap[A, B, C, D](f: (Context[A, B]) => Context[C, D])(graph: BaseGraph[A, B]): BaseGraph[C, D] =
         graph match {
-            case Empty => Empty.asInstanceOf[BaseGraph[C, D]];
+            case Empty => Empty;
             case Graph(ctx, parent) => f(ctx) &: gmap(f)(parent)
         }
 
