@@ -41,13 +41,13 @@ object Types {
      * the node pointed to, and an edge label. Labels can be set to Unit when
      * not used.
      */
-    type Adj[+B] = Seq[Tuple2[B, Node]]
+    type Adj[+B] = Seq[(B, Node)]
     /**
      * Definition of a graph context type
      *
      * A graph is built inductively using contexts.
      */
-    type Context[+A, +B] = Tuple4[Adj[B], Node, A, Adj[B]]
+    type Context[+A, +B] = (Adj[B], Node, A, Adj[B])
 }
 import Types._
 
@@ -78,7 +78,7 @@ trait BaseGraph[+A, +B] {
         val nodes = Funs.nodes(this)
 
         (context._1 ++ context._4) foreach(
-            (node: Tuple2[BB, Node]) => require(nodes contains (node._2)))
+            (node: (BB, Node)) => require(nodes contains (node._2)))
 
         new Graph[AA, BB](context, this)
     }
@@ -97,7 +97,7 @@ trait BaseGraph[+A, +B] {
      * @todo        find a better method name (<code>&amp;v:</code> would be
      *              ideal)
      */
-    def &:(node: Node): Tuple2[Option[Context[A, B]], BaseGraph[A, B]] = {
+    def &:(node: Node): (Option[Context[A, B]], BaseGraph[A, B]) = {
         // Implementation
         //
         // 1. Generate a list of all contexts of graph
@@ -126,8 +126,8 @@ trait BaseGraph[+A, +B] {
             val new_ctx = (ctx._1 filter(_._2 != node), ctx._2, ctx._3, ctx._4 filter(_._2 != node))
             the_graph = new_ctx &: the_graph
 
-            val new_ins = ctx._4.filter((_: Tuple2[B, Node])._2 == node).map((n: Tuple2[B, Node]) => (n._1, ctx._2))
-            val new_outs = ctx._1.filter((_: Tuple2[B, Node])._2 == node).map((n: Tuple2[B, Node]) => (n._1, ctx._2))
+            val new_ins = ctx._4.filter(_._2 == node).map((n: (B, Node)) => (n._1, ctx._2))
+            val new_outs = ctx._1.filter(_._2 == node).map((n: (B, Node)) => (n._1, ctx._2))
 
             the_ctx = (new_ins ++ the_ctx._1, the_ctx._2, the_ctx._3, new_outs ++ the_ctx._4)
             ()
