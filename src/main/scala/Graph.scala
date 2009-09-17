@@ -262,6 +262,38 @@ object Funs {
 
         gmap(helper)(graph)
     }
+
+    /**
+     * Calculate list of successor nodes of a given node in a graph, or None
+     * if the node can't be found
+     *
+     * @param v  node to calculate successors of
+     *
+     * @return   optional successor node list
+     *
+     * @todo     write tests
+     */
+    def gsuc[A, B](v: Node)(graph: BaseGraph[A, B]): Option[Seq[Node]] =
+        v &: graph match {
+            case (None, _) => None;
+            case (Some(ctx), _) => Some(ctx._4 map (_._2))
+        }
+
+    /**
+     * Calculate list of predecessor nodes of a given node in a graph, or None
+     * if the node can't be found
+     *
+     * @param v  node to calculate predecessors of
+     *
+     * @return   optional predecessor node list
+     *
+     * @todo     write tests
+     */
+    def gpred[A, B](v: Node)(graph: BaseGraph[A, B]): Option[Seq[Node]] =
+        v &: graph match {
+            case (None, _) => None;
+            case (Some(ctx), _) => Some(ctx._1 map (_._2))
+        }
 }
 
 import Funs._
